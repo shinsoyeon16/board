@@ -21,7 +21,8 @@ public class BoardDAO {
 	private final String DELETE_BOARD = "delete from board where seq=?";
 	private final String GET_BOARD = "select * from board where seq=?";
 	private final String GET_BOARD_LIST = "select * from board";
-	private final String SEARCH_BOARD = "select * from board where ? like %? or ? like ?%";
+	private final String SEARCH_BOARD_1 = "select * from board where title =?";
+	private final String SEARCH_BOARD_2 = "select * from board where content =?";
 	private final String ADD_CNT = "update board set cnt=cnt+1 where seq=?";
 	
 	public void insertBoard(BoardVO vo) {
@@ -116,17 +117,40 @@ public class BoardDAO {
 			}
 		return list;
 	}
-	public ArrayList<BoardVO> searchBoard(String searchCondition, String searchKeyword) {
-		System.out.println("==> JDBC로 searchBoard() : "+ SEARCH_BOARD);
+	public ArrayList<BoardVO> searchBoard(String searchKeyword) {
+		System.out.println("==> JDBC로 searchBoard() : "+ SEARCH_BOARD_1);
 		ArrayList<BoardVO> list = new ArrayList<BoardVO>();
 		BoardVO board = null;
 		try{
 			conn = JDBCUtil.getConnection();
-			stmt = conn.prepareStatement(SEARCH_BOARD);
-			stmt.setString(1, searchCondition);
-			stmt.setString(2, searchKeyword);
-			stmt.setString(3, searchCondition);
-			stmt.setString(4, searchKeyword);
+			stmt = conn.prepareStatement(SEARCH_BOARD_1);
+			stmt.setString(1, searchKeyword);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				board = new BoardVO();
+				board.setSeq(rs.getInt(1));
+				board.setTitle(rs.getString(2));
+				board.setWriter(rs.getString(3));
+				board.setContent(rs.getString(4));
+				board.setRegDate(rs.getDate(5));
+				board.setCnt(rs.getInt(6));
+				list.add(board);
+			}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				JDBCUtil.close(conn, stmt, rs);
+			}
+		return list;
+	}
+	public ArrayList<BoardVO> searchBoard(String searchCondition, String searchKeyword) {
+		System.out.println("==> JDBC로 searchBoard() : "+ SEARCH_BOARD_2);
+		ArrayList<BoardVO> list = new ArrayList<BoardVO>();
+		BoardVO board = null;
+		try{
+			conn = JDBCUtil.getConnection();
+			stmt = conn.prepareStatement(SEARCH_BOARD_2);
+			stmt.setString(1, searchKeyword);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				board = new BoardVO();

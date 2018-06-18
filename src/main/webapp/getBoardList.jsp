@@ -40,8 +40,8 @@ if(vo==null) {
 <table border="1" cellpadding="0" width="700">
 <tr><td align="right">
 	<select name="searchCondition">
-	<option value="TITLE">제목
-	<option value="CONTENT">내용
+	<option value="title">제목
+	<option value="content">내용
 	</select>
 	<input name="searchKeyword" type="text"/>
 	<input type="submit" value="검색" />

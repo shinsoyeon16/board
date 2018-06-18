@@ -15,15 +15,18 @@ public class GetBoardController implements Controller{
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String searchCondition  = request.getParameter("searchCondition");
 		String searchKeyword = request.getParameter("searchKeyword");
-		
 		if(searchKeyword.isEmpty()) {
-			request.setAttribute("result", "모든 항목을 입력해주시기 바랍니다.");
 			HttpUtil.forward(request, response, "getBoardList.do");
 			return;
 		}
 		BoardVO vo = new BoardVO();
 		BoardDAO dao = new BoardDAO();
-		ArrayList<BoardVO> list = dao.searchBoard(searchCondition,searchKeyword);
+		ArrayList<BoardVO> list = new ArrayList<BoardVO>();
+		if(searchCondition.equals("title")) {
+			list = dao.searchBoard(searchKeyword);
+		} else if(searchCondition.equals("content")) {
+			list = dao.searchBoard(searchCondition,searchKeyword);
+		}
 		
 		request.setAttribute("list", list);
 		HttpUtil.forward(request, response, "getBoardList.jsp");
