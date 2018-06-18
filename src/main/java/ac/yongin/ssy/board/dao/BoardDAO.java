@@ -18,12 +18,14 @@ public class BoardDAO {
 
 	private final String INSERT_BOARD = "insert into board(title,writer,content) values(?,?,?)";
 	private final String UPDATE_BOARD = "update board set title=?, content=? where seq=?";
-	private final String DELETE_BOARD = "delete board where seq=?";
+	private final String DELETE_BOARD = "delete from board where seq=?";
 	private final String GET_BOARD = "select * from board where seq=?";
 	private final String GET_BOARD_LIST = "select * from board";
+	private final String SEARCH_BOARD = "select * from board where ? like %? or ? like ?%";
+	private final String ADD_CNT = "update board set cnt=cnt+1 where seq=?";
 	
 	public void insertBoard(BoardVO vo) {
-		System.out.println("==> JDBC·Î insertBoard() : "+ INSERT_BOARD);
+		System.out.println("==> JDBCë¡œ insertBoard() : "+ INSERT_BOARD);
 		try{
 		conn = JDBCUtil.getConnection();
 		stmt = conn.prepareStatement(INSERT_BOARD);
@@ -38,7 +40,7 @@ public class BoardDAO {
 		}
 	}
 	public void updateBoard(BoardVO vo) {
-		System.out.println("==> JDBC·Î updateBoard() : "+ UPDATE_BOARD);
+		System.out.println("==> JDBCë¡œ updateBoard() : "+ UPDATE_BOARD);
 		try{
 			conn = JDBCUtil.getConnection();
 			stmt = conn.prepareStatement(UPDATE_BOARD);
@@ -53,7 +55,7 @@ public class BoardDAO {
 			}
 	}
 	public void deleteBoard(BoardVO vo) {
-		System.out.println("==> JDBC·Î deleteBoard() : "+ DELETE_BOARD);
+		System.out.println("==> JDBCë¡œ deleteBoard() : "+ DELETE_BOARD);
 		try{
 			conn = JDBCUtil.getConnection();
 			stmt = conn.prepareStatement(DELETE_BOARD);
@@ -66,7 +68,7 @@ public class BoardDAO {
 			}
 	}
 	public BoardVO getBoard(BoardVO vo) {
-		System.out.println("==> JDBC·Î getBoard() : "+ GET_BOARD);
+		System.out.println("==> JDBCë¡œ getBoard() : "+ GET_BOARD);
 		BoardVO board = null;
 		try{
 			conn = JDBCUtil.getConnection();
@@ -90,7 +92,7 @@ public class BoardDAO {
 		return board;
 	}
 	public ArrayList<BoardVO> getBoardList(BoardVO vo) {
-		System.out.println("==> JDBC·Î getBoardList() : "+ GET_BOARD_LIST);
+		System.out.println("==> JDBCë¡œ getBoardList() : "+ GET_BOARD_LIST);
 		ArrayList<BoardVO> list = new ArrayList<BoardVO>();
 		BoardVO board = null;
 		try{
@@ -113,5 +115,47 @@ public class BoardDAO {
 				JDBCUtil.close(conn, stmt, rs);
 			}
 		return list;
+	}
+	public ArrayList<BoardVO> searchBoard(String searchCondition, String searchKeyword) {
+		System.out.println("==> JDBCë¡œ searchBoard() : "+ SEARCH_BOARD);
+		ArrayList<BoardVO> list = new ArrayList<BoardVO>();
+		BoardVO board = null;
+		try{
+			conn = JDBCUtil.getConnection();
+			stmt = conn.prepareStatement(SEARCH_BOARD);
+			stmt.setString(1, searchCondition);
+			stmt.setString(2, searchKeyword);
+			stmt.setString(3, searchCondition);
+			stmt.setString(4, searchKeyword);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				board = new BoardVO();
+				board.setSeq(rs.getInt(1));
+				board.setTitle(rs.getString(2));
+				board.setWriter(rs.getString(3));
+				board.setContent(rs.getString(4));
+				board.setRegDate(rs.getDate(5));
+				board.setCnt(rs.getInt(6));
+				list.add(board);
+			}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				JDBCUtil.close(conn, stmt, rs);
+			}
+		return list;
+	}
+	public void addCnt(BoardVO vo) {
+		System.out.println("==> JDBCë¡œ addCnt() : "+ ADD_CNT);
+		try{
+			conn = JDBCUtil.getConnection();
+			stmt = conn.prepareStatement(ADD_CNT);
+			stmt.setInt(1, vo.getSeq());
+			stmt.executeUpdate();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				JDBCUtil.close(conn, stmt);
+			}
 	}
 }

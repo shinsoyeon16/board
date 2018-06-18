@@ -19,7 +19,7 @@ public class UserDAO {
 	public UserVO getUser(UserVO vo) {
 		String sql = "select * from users where id=? and password=?";
 		UserVO user = null;
-		System.out.println("==> JDBC·Î getUser() : "+sql);
+		System.out.println("==> JDBCë¡œ getUser() : "+sql);
 		try {
 			conn = JDBCUtil.getConnection();
 			stmt = conn.prepareStatement(sql);
